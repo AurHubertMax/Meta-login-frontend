@@ -4,7 +4,7 @@ const API_ENDPOINT = process.env.REACT_APP_APIENDPOINT || "http://localhost:4500
 
 export const checkBackend = async () => {
     try {
-        const response = await axios.get(`${API_ENDPOINT}/health`, {
+        const response = await axios.get(`${API_ENDPOINT}/api/health`, {
             headers: {
                 "Content-Type": "application/json"
             }

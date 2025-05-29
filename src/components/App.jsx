@@ -1,18 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import HomePage from '../pages/homePage.jsx';
 import * as loginHelpers from './helpers/loginHelpers.jsx'
+import '../styles/app.css';
 
 const App = () => {
-    const handleButtonClick = async () => {
-        console.log('Button clicked!');
+    const checkBackendStatus = async () => {
         const response = await loginHelpers.checkBackend();
         console.log('response',response);
     }
 
+    useEffect(() => {
+        checkBackendStatus();
+    }, [])
+
     return (
-        <div>
-            <h1>Welcome to My React App</h1>
-            <p>This is a simple React application.</p>
-            <button onClick={handleButtonClick}>Click Me</button>
+        <div className="app">
+            {/* Navigation would typically go here */}
+            <main>
+                <Switch>
+                    <Route exact path="/" component={HomePage} />
+                    {/* Add more routes as needed */}
+                </Switch>
+            </main>
         </div>
     );
 };
