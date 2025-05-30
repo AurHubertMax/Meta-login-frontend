@@ -6,8 +6,8 @@ const HomePage = () => {
     <div className="home-page">
       <header className="hero">
         <h1>Welcome to Our Application</h1>
-        <p>Connect with Meta and start using our services today.</p>
-        <button className="cta-button">Get Started</button>
+        <p>Connection Status: </p>
+        <button className="cta-button">Log in with Facebook</button>
       </header>
       
       <section className="features">
