@@ -1,13 +1,43 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../styles/home.css';
+import { toast } from 'react-toastify';
+import { loadFacebookSDK, handleFacebookLogin } from '../components/helpers/loginHelpers';
 
 const HomePage = () => {
+  useEffect(() => {
+    const initializeFacebookSDK = async () => {
+      try {
+        await loadFacebookSDK();
+        console.log('Facebook SDK loaded successfully');
+      } catch (error) {
+        console.error('Error loading Facebook SDK:', error);
+      }
+    };
+
+    initializeFacebookSDK();
+  }, []);
+
+  const handleLoginButtonClick = async () => {
+    const response = await handleFacebookLogin();
+
+    if (response.status === 'success') {
+      toast.success('Logged in successfully!');
+    } else if (response.status === 'error') {
+      toast.error(response.message);
+    }
+  };
+
   return (
     <div className="home-page">
       <header className="hero">
         <h1>Welcome to Our Application</h1>
         <p>Connection Status: </p>
-        <button className="cta-button">Log in with Facebook</button>
+        <button 
+          className="cta-button"
+          onClick={handleLoginButtonClick}
+        >
+          Log in with Facebook
+        </button>
       </header>
       
       <section className="features">
