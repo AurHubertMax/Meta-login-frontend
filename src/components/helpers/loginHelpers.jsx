@@ -66,7 +66,12 @@ export const handleFacebookLogin = () => {
                     .then(callbackResponse => {
                         resolve(callbackResponse.data);
                     })
-                    .catch(error => { reject(error) });
+                    .catch(error => {
+                        resolve({
+                            status: "error",
+                            message: error.response?.data?.message || "An error occurred during login."
+                        })
+                    });
                     
                 } else {
                     resolve({
@@ -83,3 +88,60 @@ export const handleFacebookLogin = () => {
     })
     
 }
+
+export const checkFacebookLoginStatus = () => {
+    return new Promise((resolve, reject) => {
+        // TODO: implement FB SDK checkLoginStatus
+
+        axios.get(`${API_ENDPOINT}/api/auth/facebook/status`)
+        .then(callbackResponse => {
+            resolve(callbackResponse.data);
+        })
+        .catch(error => {
+            resolve({
+                status: "error",
+                message: error.response?.data?.message || "An error occurred during login."
+            })
+        });
+    })
+}
+
+export const handleFacebookLogout = () => {
+    return new Promise((resolve, reject) => {
+        window.FB.getLoginStatus(function(response) {
+            if (response.status === 'connected') {
+                window.FB.logout(() => {
+                    clearBackendSession(resolve);
+                });
+            } else {
+                clearBackendSession(resolve);
+            }
+        });
+    });
+};
+
+// Helper function to clear backend session
+const clearBackendSession = (resolve) => {
+    axios.post(`${API_ENDPOINT}/api/auth/facebook/disconnect`)
+        .then(callbackResponse => {
+            if (callbackResponse.data.status === "success") {
+                resolve({
+                    status: "success",
+                    message: "Logged out successfully."
+                });
+            } else {
+                resolve({
+                    status: "error",
+                    message: callbackResponse.data.message || "Failed to clear session on backend."
+                });
+            }
+            
+        })
+        .catch(error => {
+            console.warn("Backend logout failed:", error);
+            resolve({
+                status: "error",
+                message: "Failed to clear session on backend."
+            });
+        });
+};
