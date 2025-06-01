@@ -60,6 +60,7 @@ export const handleFacebookLogin = () => {
         window.FB.login(
             response => {
                 if (response.authResponse) {
+                    console.log("FB login response:", response);
                     axios.post(`${API_ENDPOINT}/api/auth/facebook/callback`, {
                         data: response.authResponse
                     })
@@ -91,18 +92,29 @@ export const handleFacebookLogin = () => {
 
 export const checkFacebookLoginStatus = () => {
     return new Promise((resolve, reject) => {
-        // TODO: implement FB SDK checkLoginStatus
-
-        axios.get(`${API_ENDPOINT}/api/auth/facebook/status`)
-        .then(callbackResponse => {
-            resolve(callbackResponse.data);
+        window.FB.getLoginStatus(function(response) {
+            if (response.status === 'connected') {
+                resolve({
+                    status: "connected",
+                    message: "User is already logged in.",
+                    authResponse: response.authResponse
+                });
+            }
+            if (response.status === 'not_authorized') {
+                resolve({
+                    status: "not_authorized",
+                    message: "User is logged in to Facebook but have not authorized the app.",
+                    authResponse: response.authResponse
+                });
+            }
+            if (response.status === 'unknown') {
+                resolve({
+                    status: "unknown",
+                    message: "User is not logged in to Facebook.",
+                    authResponse: null
+                });
+            }
         })
-        .catch(error => {
-            resolve({
-                status: "error",
-                message: error.response?.data?.message || "An error occurred during login."
-            })
-        });
     })
 }
 
@@ -110,7 +122,8 @@ export const handleFacebookLogout = () => {
     return new Promise((resolve, reject) => {
         window.FB.getLoginStatus(function(response) {
             if (response.status === 'connected') {
-                window.FB.logout(() => {
+                window.FB.logout((response) => {
+                    console.log("FB logout response:", response);
                     clearBackendSession(resolve);
                 });
             } else {

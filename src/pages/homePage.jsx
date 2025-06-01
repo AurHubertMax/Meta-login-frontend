@@ -20,25 +20,27 @@ const HomePage = () => {
       try {
         await loginHelper.loadFacebookSDK();
         console.log('Facebook SDK loaded successfully');
+
+        const loginStatus = await loginHelper.checkFacebookLoginStatus();
+        console.log('Login status:', loginStatus);
+
+        if (loginStatus.status === 'connected') {
+          setConnectionStatus('Connected');
+          console.log('accessToken:', loginStatus.authResponse.accessToken);
+          setTokenInfo({
+            status: loginStatus.status,
+            message: loginStatus.message,
+            userId: loginStatus.authResponse.userID,
+            timestamp: new Date().toISOString(),
+            expiresIn: loginStatus.authResponse.expiresIn
+          });
+        }
       } catch (error) {
         console.error('Error loading Facebook SDK:', error);
       }
     };
-
-    loginHelper.checkFacebookLoginStatus().then(response => {
-      if (response.status === 'connected') {
-        setConnectionStatus('Connected');
-        setTokenInfo({
-          status: response.status,
-          message: response.message,
-          userId: response.userId,
-          timestamp: response.timestamp,
-          expiresIn: response.expiresIn
-        });
-      }
-    })
-
     initializeFacebookSDK();
+    
   }, []);
 
   const handleLoginButtonClick = async () => {
