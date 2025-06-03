@@ -23,7 +23,7 @@ const HomePage = () => {
         await loginHelper.loadFacebookSDK();
         console.log('Facebook SDK loaded successfully');
 
-        const loginStatus = await loginHelper.checkFacebookLoginStatus();
+        const loginStatus = await loginHelper.getFacebookAuthStatus();
         console.log('Login status:', loginStatus);
 
         if (loginStatus.status === 'connected') {
