@@ -3,6 +3,7 @@ import '../styles/home.css';
 import { toast } from 'react-toastify';
 // import { loadFacebookSDK, handleFacebookLogin } from '../components/helpers/loginHelpers';
 const loginHelper = require('../components/helpers/loginHelpers');
+const pagesHelper = require('../components/helpers/pagesHelpers');
 
 const HomePage = () => {
   const [detailsExpanded, setDetailsExpanded] = useState(false);
@@ -83,6 +84,17 @@ const HomePage = () => {
     setDetailsExpanded(prev => !prev);
   }
 
+  const handleGetPages = async () => {
+    console.log('Fetching Facebook pages...');
+    const response = await pagesHelper.getFacebookPages();
+    if (response.status === 'success') {
+      toast.success('Fetched Facebook pages successfully!');
+      console.log('Facebook Pages:', response.pages);
+    } else {
+      toast.error(response.message);
+    }
+  }
+
   return (
     <div className="home-page">
       <header className="header-container">
@@ -157,6 +169,13 @@ const HomePage = () => {
           <p>Enjoy a consistent experience across all your devices.</p>
         </div>
       </section>
+
+      <button 
+        className='cta-button'
+        onClick={handleGetPages}
+      >
+        Get Facebook Pages
+      </button>
     </div>
   );
 };

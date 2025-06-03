@@ -61,6 +61,7 @@ export const handleFacebookLogin = () => {
             response => {
                 if (response.authResponse) {
                     console.log("FB login response:", response);
+                    testAPI(); // Optional: Call testAPI to fetch user info
                     axios.post(`${API_ENDPOINT}/api/auth/facebook/callback`, {
                         data: response.authResponse
                     })
@@ -82,7 +83,7 @@ export const handleFacebookLogin = () => {
                 }
             },
             {
-                scope: 'public_profile,email,pages_show_list,pages_manage_posts,instagram_basic,instagram_content_publish',
+                scope: 'public_profile,email,pages_show_list,pages_manage_posts,instagram_basic,instagram_content_publish,business_management',
                 auth_type: 'rerequest'
             },
         );
@@ -93,7 +94,9 @@ export const handleFacebookLogin = () => {
 export const checkFacebookLoginStatus = () => {
     return new Promise((resolve, reject) => {
         window.FB.getLoginStatus(function(response) {
+            console.log("FB login status response:", response);
             if (response.status === 'connected') {
+                testAPI(); // Optional: Call testAPI to fetch user info
                 resolve({
                     status: "connected",
                     message: "User is already logged in.",
@@ -136,25 +139,65 @@ export const handleFacebookLogout = () => {
 // Helper function to clear backend session
 const clearBackendSession = (resolve) => {
     axios.post(`${API_ENDPOINT}/api/auth/facebook/disconnect`)
-        .then(callbackResponse => {
-            if (callbackResponse.data.status === "success") {
-                resolve({
-                    status: "success",
-                    message: "Logged out successfully."
-                });
-            } else {
-                resolve({
-                    status: "error",
-                    message: callbackResponse.data.message || "Failed to clear session on backend."
-                });
-            }
-            
-        })
-        .catch(error => {
-            console.warn("Backend logout failed:", error);
+    .then(callbackResponse => {
+        if (callbackResponse.data.status === "success") {
+            resolve({
+                status: "success",
+                message: "Logged out successfully."
+            });
+        } else {
             resolve({
                 status: "error",
-                message: "Failed to clear session on backend."
+                message: callbackResponse.data.message || "Failed to clear session on backend."
             });
+        }
+        
+    })
+    .catch(error => {
+        console.warn("Backend logout failed:", error);
+        resolve({
+            status: "error",
+            message: "Failed to clear session on backend."
         });
+    });
 };
+
+function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    window.FB.api('/me', function(meResponse) {
+        console.log('Successful login for: ' + meResponse.name);
+    });
+    window.FB.api('/me/accounts', function(pagesResponse) {
+        console.log('Pages:', pagesResponse);
+        if (pagesResponse && pagesResponse.data && pagesResponse.data.length > 0) {
+            pagesResponse.data.forEach(page => {
+                console.log('checking instagram account for page:', page.name);
+
+                window.FB.api(`/${page.id}?fields=instagram_business_account`, 
+                    {
+                        accessToken: page.access_token
+                    },
+                    function(instagramResponse) {
+                        if (instagramResponse && instagramResponse.instagram_business_account) {
+                            console.log(`Instagram account for page ${page.name}:`, instagramResponse.instagram_business_account);
+                            window.FB.api(
+                                `/${instagramResponse.instagram_business_account.id}?fields=username,profile_picture_url,name`,
+                                { access_token: page.access_token },
+                                function(instaDetailsResponse) {
+                                    console.log(`Instagram account details:`, instaDetailsResponse);
+                                }
+                            );
+                        } else {
+                            console.log(`No Instagram account linked for page ${page.name}`);
+                        }
+                    }
+                );
+            })
+        }
+
+    });
+    window.FB.api('/me/businesses', function(businessesResponse) {
+        console.log('Businesses:', businessesResponse);
+    });
+    
+}
