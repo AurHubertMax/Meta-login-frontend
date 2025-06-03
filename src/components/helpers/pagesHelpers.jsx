@@ -10,16 +10,15 @@ export const getFacebookPages = () => {
                     status: "error",
                     message: "User is not logged in to Facebook.",
                     error: "User not authenticated"
-                })
+                });
                 return;
             }
-            console.log("FB login response:", loginResponse);
-            window.FB.api(`/me/accounts`, {
-                accessToken: loginResponse.authResponse.accessToken,
-            }, (pagesResponse) => {
 
-                if (pagesResponse && pagesResponse.error) {
-                    console.error('Facebook Pages API error:', pagesResponse.error);
+            logResponse(loginResponse);
+
+            window.FB.api('/me/accounts', function(pagesResponse) {
+                logResponse(pagesResponse);
+                if (!pagesResponse || pagesResponse.error) {
                     resolve({
                         status: "error",
                         message: pagesResponse.error.message || "Failed to fetch Facebook pages",
@@ -27,15 +26,22 @@ export const getFacebookPages = () => {
                     });
                     return;
                 }
-                
-                console.log("Facebook Pages Response:", pagesResponse)
+
                 resolve({
                     status: "success",
                     message: "Fetched Facebook pages successfully.",
                     pages: pagesResponse.data
                 })
             })
+
         })
-        
     })
+}
+
+export const postToFacebookPage = (pageId, message) => {
+    
+}
+
+function logResponse(response) {
+    console.log('FB login status response:', response);
 }

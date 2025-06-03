@@ -15,6 +15,7 @@ const HomePage = () => {
     timestamp: null,
     expiresIn: null
   });
+  const [pages, setPages] = useState([]);
 
   useEffect(() => {
     const initializeFacebookSDK = async () => {
@@ -88,8 +89,9 @@ const HomePage = () => {
     console.log('Fetching Facebook pages...');
     const response = await pagesHelper.getFacebookPages();
     if (response.status === 'success') {
+      setPages(response.data);
       toast.success('Fetched Facebook pages successfully!');
-      console.log('Facebook Pages:', response.pages);
+      console.log('Facebook Pages:', pages);
     } else {
       toast.error(response.message);
     }
