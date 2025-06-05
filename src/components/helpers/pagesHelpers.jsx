@@ -2,11 +2,9 @@ import { api } from "../../services/api"
 
 export const getFacebookPages = () => {
     return new Promise((resolve, reject) => {
-        api.get(`/pages`, {
-            withCredentials: true,
-        })
+        api.get(`/pages`)
         .then(response => {
-            logResponse(response, "pages");
+            logResponse(response.data, "pages");
             resolve(response.data);
         })
         .catch(error => {
@@ -17,43 +15,6 @@ export const getFacebookPages = () => {
         })
     })
 }
-
-
-// export const getFacebookPages = () => {
-//     return new Promise((resolve, reject) => {
-//         window.FB.getLoginStatus(function(loginResponse) {
-//             if (loginResponse.status !== 'connected') {
-//                 resolve({
-//                     status: "error",
-//                     message: "User is not logged in to Facebook.",
-//                     error: "User not authenticated"
-//                 });
-//                 return;
-//             }
-
-//             logResponse(loginResponse, "get login status");
-
-//             window.FB.api('/me/accounts', function(pagesResponse) {
-//                 logResponse(pagesResponse, "get pages");
-//                 if (!pagesResponse || pagesResponse.error) {
-//                     resolve({
-//                         status: "error",
-//                         message: pagesResponse.error.message || "Failed to fetch Facebook pages",
-//                         error: pagesResponse.error
-//                     });
-//                     return;
-//                 }
-
-//                 resolve({
-//                     status: "success",
-//                     message: "Fetched Facebook pages successfully.",
-//                     pages: pagesResponse.data
-//                 })
-//             })
-
-//         })
-//     })
-// }
 
 export const postToFacebookPage = (pageId, message) => {
     

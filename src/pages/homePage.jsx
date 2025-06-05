@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/home.css';
 import { toast } from 'react-toastify';
-// import { loadFacebookSDK, handleFacebookLogin } from '../components/helpers/loginHelpers';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { useHistory } from 'react-router-dom';
 const loginHelper = require('../components/helpers/loginHelpers');
 const pagesHelper = require('../components/helpers/pagesHelpers');
 
+
+
 const HomePage = () => {
+  const history = useHistory();
+
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Disconnected');
   const [tokenInfo, setTokenInfo] = useState({
@@ -91,7 +98,6 @@ const HomePage = () => {
     if (response.status === 'success') {
       setPages(response.data);
       toast.success('Fetched Facebook pages successfully!');
-      console.log('Facebook Pages:', pages);
     } else {
       toast.error(response.message);
     }
@@ -173,27 +179,92 @@ const HomePage = () => {
         
       </header>
       
-      <section className="features">
-        <div className="feature">
-          <h2>Facebook</h2>
-          <p>Connect your Meta account in just a few clicks.</p>
-        </div>
-        <div className="feature">
-          <h2>Instagram</h2>
-          <p>Your data is always protected with our secure authentication.</p>
-        </div>
-        <div className="feature">
-          <h2>Threads</h2>
-          <p>Enjoy a consistent experience across all your devices.</p>
-        </div>
-      </section>
+      { connectionStatus === 'Connected' && (
+        <section className="features">
+          <div className="feature">
+            <h2>Pages</h2>
+            <p>See Facebook Pages connected to your account.</p>
+            <button 
+              className='cta-button'
+              onClick={handleGetPages}
+            >
+              {pages.length > 0 ? 'Refresh Pages' : 'Get My Pages'}
+            </button>
 
-      <button 
-        className='cta-button'
-        onClick={handleGetPages}
-      >
-        Get Facebook Pages
-      </button>
+            <div className="pages-list-container">
+              {pages.length > 0 ? (
+                <ul className="pages-list">
+                  {pages.map(page => (
+                    <li key={page.id} className="page-item">
+                      <div className="page-info">
+                        <h3 className="page-name">
+                          {page.name}
+                          {page.instagram_business_account && (
+                            <a
+                              href={`https://www.instagram.com/accounts/${page.instagram_business_account.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className='instagram-badge'
+                              title='View on Instagram'
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faInstagram} />
+                              <span className="instagram-text">Instagram</span>
+                            </a>
+                          )}
+                        </h3>
+                        
+                        <div className="page-details">
+                          <span className='page-id'>ID: {page.id}</span>
+                          
+                        </div>
+                        <div className='page-tasks'>
+                          {page.tasks.map(task => (
+                            <span key={task} className='task-badge'>{task}</span>
+                          ))}
+                        </div>
+                        <div className='page-actions'>
+                          <a
+                            href={`https://www.facebook.com/${page.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className='view-page-link'
+                          >
+                            View Page
+                          </a>
+                          <button 
+                            className='post-button'
+                            onClick={() => (history.push('/createPost/' + page.id))}
+                          >
+                            Create Post
+                          </button>
+                        </div>
+                      </div>
+                      
+                    </li>
+                    
+                  ))}
+                </ul>
+              ) : (
+                <p className="no-pages-message">No pages found.</p>
+              )}
+            </div>
+          </div>
+          <div className="feature">
+            <h2>Instagram</h2>
+            <p>Your data is always protected with our secure authentication.</p>
+          </div>
+          <div className="feature">
+            <h2>Threads</h2>
+            <p>Enjoy a consistent experience across all your devices.</p>
+          </div>
+        </section>
+      )}
+      
+
+      
     </div>
   );
 };

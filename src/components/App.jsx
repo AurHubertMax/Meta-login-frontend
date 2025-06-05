@@ -3,6 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import HomePage from '../pages/homePage.jsx';
+import CreatePost from '../pages/createPost.jsx';
 import * as loginHelpers from './helpers/loginHelpers.jsx'
 import '../styles/app.css';
 
@@ -33,6 +34,7 @@ const App = () => {
             <main>
                 <Switch>
                     <Route exact path="/" component={HomePage} />
+                    <Route path="/createPost/:pageId" component={CreatePost} />
                     {/* Add more routes as needed */}
                 </Switch>
             </main>
