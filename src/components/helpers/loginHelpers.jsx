@@ -1,15 +1,8 @@
-import axios from "axios"
-
-const API_ENDPOINT = process.env.REACT_APP_APIENDPOINT || "http://localhost:4500"
+import { api } from "../../services/api"
 
 export const checkBackend = async () => {
     try {
-        const response = await axios.get(`${API_ENDPOINT}/api/health`, {
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-
+        const response = await api.get(`/health`)
         return{ 
             status: "success", 
             message: "Backend is reachable",
@@ -61,7 +54,7 @@ export const handleFacebookLogin = () => {
             response => {
                 if (response.authResponse) {
                     console.log("FB login response:", response);
-                    axios.post(`${API_ENDPOINT}/api/auth/facebook/callback`, {
+                    api.post(`/auth/facebook/callback`, {
                         data: response.authResponse
                     })
                     .then(callbackResponse => {
@@ -92,9 +85,7 @@ export const handleFacebookLogin = () => {
 
 export const getFacebookAuthStatus = () => {
     return new Promise((resolve, reject) => {
-        axios.get(`${API_ENDPOINT}/api/auth/facebook/status`, {
-            withCredentials: true,
-        })
+        api.get(`/auth/facebook/status`)
         .then(response => {
             console.log("FB auth status response:", response);
             resolve(response.data);
@@ -107,41 +98,6 @@ export const getFacebookAuthStatus = () => {
         })
     })
 }
-
-// export const checkFacebookLoginStatus = () => {
-//     return new Promise((resolve, reject) => {
-//         window.FB.getLoginStatus(function(response) {
-//             console.log("FB login status response:", response);
-//             if (response.status === 'connected') {
-//                 axios.post(`${API_ENDPOINT}/api/auth/facebook/callback`, {
-//                     data: response.authResponse
-//                 })
-//                 .then(callbackResponse => {
-//                     resolve(callbackResponse.data);
-//                 })
-//                 .catch(error => {
-//                     resolve({
-//                         status: "error",
-//                         message: error.response?.data?.message || "An error occurred while checking login status."
-//                     });
-//                 })
-//             }
-//             if (response.status === 'not_authorized') {
-//                 resolve({
-//                     status: "not_authorized",
-//                     message: "User is logged in to Facebook but have not authorized the app. Please log in again.",
-//                 });
-//             }
-//             if (response.status === 'unknown') {
-//                 resolve({
-//                     status: "unknown",
-//                     message: "User is not logged in to Facebook.",
-//                     authResponse: null
-//                 });
-//             }
-//         })
-//     })
-// }
 
 export const handleFacebookLogout = () => {
     return new Promise((resolve, reject) => {
@@ -160,7 +116,7 @@ export const handleFacebookLogout = () => {
 
 // Helper function to clear backend session
 const clearBackendSession = (resolve) => {
-    axios.post(`${API_ENDPOINT}/api/auth/facebook/disconnect`)
+    api.post(`/auth/facebook/disconnect`)
     .then(callbackResponse => {
         if (callbackResponse.data.status === "success") {
             resolve({

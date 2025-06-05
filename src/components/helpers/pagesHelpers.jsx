@@ -1,14 +1,12 @@
-import axios from "axios"
-
-const API_ENDPOINT = process.env.REACT_APP_APIENDPOINT || "http://localhost:4500"
+import { api } from "../../services/api"
 
 export const getFacebookPages = () => {
     return new Promise((resolve, reject) => {
-        axios.get(`${API_ENDPOINT}/api/pages`, {
+        api.get(`/pages`, {
             withCredentials: true,
         })
         .then(response => {
-            console.log("FB pages response:", response);
+            logResponse(response, "pages");
             resolve(response.data);
         })
         .catch(error => {

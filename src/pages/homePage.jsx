@@ -26,15 +26,15 @@ const HomePage = () => {
         const loginStatus = await loginHelper.getFacebookAuthStatus();
         console.log('Login status:', loginStatus);
 
-        if (loginStatus.status === 'connected') {
+        if (loginStatus.status === 'success' && loginStatus.data.status === 'connected') {
           setConnectionStatus('Connected');
-          console.log('accessToken:', loginStatus.authResponse.accessToken);
+          // console.log('accessToken:', loginStatus.authResponse.accessToken);
           setTokenInfo({
-            status: loginStatus.status,
-            message: loginStatus.message,
-            userId: loginStatus.authResponse.userID,
+            status: loginStatus.data.status,
+            message: loginStatus.data.message,
+            userId: loginStatus.data.userId,
             timestamp: new Date().toISOString(),
-            expiresIn: loginStatus.authResponse.expiresIn
+            expiresIn: new Date(loginStatus.data.tokenExpiresAt).getTime() - new Date().getTime()
           });
         }
       } catch (error) {
@@ -130,7 +130,23 @@ const HomePage = () => {
               <div className="detail-item">
                 <span className="detail-label">Expires In:</span>
                 <span className="detail-value">
-                  {tokenInfo.expiresIn ? `${Math.floor(tokenInfo.expiresIn / 3600)} hours` : 'Unknown'}
+                  {
+                    tokenInfo.expiresIn ? 
+                      (() => {
+                        const days = Math.floor(tokenInfo.expiresIn / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((tokenInfo.expiresIn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((tokenInfo.expiresIn % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        if (days > 0) {
+                          return `${days} day${days !== 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''}`;
+                        } else if (hours > 0) {
+                          return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                        } else {
+                          return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                        }
+                      })() : 
+                      'Unknown'
+                  }
                 </span>
               </div>
             </div>
