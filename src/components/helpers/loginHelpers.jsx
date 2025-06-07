@@ -75,7 +75,7 @@ export const handleFacebookLogin = () => {
                 }
             },
             {
-                scope: 'public_profile,email,pages_show_list,pages_manage_posts,instagram_basic,instagram_content_publish,business_management',
+                scope: 'public_profile,email,pages_read_engagement,pages_show_list,pages_manage_posts,instagram_basic,instagram_content_publish,business_management',
                 auth_type: 'rerequest'
             },
         );

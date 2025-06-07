@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -34,7 +34,7 @@ const App = () => {
             <main>
                 <Switch>
                     <Route exact path="/" component={HomePage} />
-                    <Route path="/createPost/:pageId" component={CreatePost} />
+                    <Route path="/createPost/pages/:pageId" component={CreatePost} />
                     {/* Add more routes as needed */}
                 </Switch>
             </main>

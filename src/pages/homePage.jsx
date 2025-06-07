@@ -13,6 +13,7 @@ const pagesHelper = require('../components/helpers/pagesHelpers');
 const HomePage = () => {
   const history = useHistory();
 
+
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Disconnected');
   const [tokenInfo, setTokenInfo] = useState({
@@ -236,7 +237,10 @@ const HomePage = () => {
                           </a>
                           <button 
                             className='post-button'
-                            onClick={() => (history.push('/createPost/' + page.id))}
+                            onClick={() => {
+                              console.log('Navigating to: /createPost/pages/' + page.id);
+                              history.push('/createPost/pages/' + page.id)
+                            }}
                           >
                             Create Post
                           </button>
