@@ -13,7 +13,6 @@ const CreatePost = () => {
 
     const [imageResetKey, setImageResetKey] = useState(0);
     const [activeTab, setActiveTab] = useState('image');
-    // const [image, setImage] = useState(null);
     const [imageUrl, setImageUrl] = useState('');
     const [linkUrl, setLinkUrl] = useState('');
     const [error, setError] = useState(null);
@@ -21,12 +20,6 @@ const CreatePost = () => {
     const handleGoBack = () => {
         window.history.back();
     }
-
-    // const handleFileSelect = (file) => {
-    //     console.log('Selected file:', file);
-    //     setImage(file);
-    //     setError(null);
-    // };
 
     useEffect(() => {
         console.log('image url:', imageUrl);
@@ -43,15 +36,10 @@ const CreatePost = () => {
         console.log('Form submitted:', { 
             message, 
             type: activeTab,
-            // image: activeTab === 'image' ? image : null,
             image: activeTab === 'image' ? imageUrl : null,
             link: activeTab === 'link' ? linkUrl : null
         });
 
-        // if (activeTab === 'image' && !image) {
-        //     setError('Please select an image before submitting.');
-        //     return;
-        // }
         if (activeTab === 'image' && !imageUrl) {
             setError('Please enter a valid image URL before submitting.');
             return;
@@ -78,7 +66,6 @@ const CreatePost = () => {
                 case 'image':
                     body = {
                         message: message,
-                        // image: image,
                         imageUrl: imageUrl,
                     }
                     response = await pagesHelper.postImageToFacebookPage(pageId, body); //image);
@@ -95,7 +82,6 @@ const CreatePost = () => {
             }
             toast.success('Post created successfully!');
             setImageResetKey(prevKey => prevKey + 1);
-            // setImage(null);
             setImageUrl('');
             setLinkUrl('');
 
@@ -147,15 +133,7 @@ const CreatePost = () => {
                             }}
                             resetKey={imageResetKey}
                             />
-                            {/* {error && <p className="error">{error}</p>} */}
                         </>
-                        // <>
-                        //     <ImageUploader 
-                        //         onImageSelect={handleFileSelect} 
-                        //         resetKey={imageResetKey} 
-                        //     />
-                        //     {image && <p className="selected-file">Selected Image: {image.name}</p>}
-                        // </>
                     ) : (
                         <>
                             <label htmlFor="linkUrl">URL:</label>

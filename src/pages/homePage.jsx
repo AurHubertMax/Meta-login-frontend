@@ -7,6 +7,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { useHistory } from 'react-router-dom';
 const loginHelper = require('../components/helpers/loginHelpers');
 const pagesHelper = require('../components/helpers/pagesHelpers');
+const instagramHelper = require('../components/helpers/instagramHelpers');
 
 
 
@@ -24,6 +25,7 @@ const HomePage = () => {
     expiresIn: null
   });
   const [pages, setPages] = useState([]);
+  const [instagramAccounts, setInstagramAccounts] = useState([]);
 
   useEffect(() => {
     const initializeFacebookSDK = async () => {
@@ -99,6 +101,17 @@ const HomePage = () => {
     if (response.status === 'success') {
       setPages(response.data);
       toast.success('Fetched Facebook pages successfully!');
+    } else {
+      toast.error(response.message);
+    }
+  }
+
+  const handleGetInstagramAccounts = async () => {
+    console.log('Fetching Instagram accounts...');
+    const response = await instagramHelper.getInstagramAccounts();
+    if (response.status === 'success') {
+      setInstagramAccounts(response.data);
+      toast.success('Fetched Instagram accounts successfully!');
     } else {
       toast.error(response.message);
     }
@@ -258,7 +271,78 @@ const HomePage = () => {
           </div>
           <div className="feature">
             <h2>Instagram</h2>
-            <p>Your data is always protected with our secure authentication.</p>
+            <p>See your Instagram account connected to your Facebook account.</p>
+            <button 
+              className='cta-button'
+              onClick={handleGetInstagramAccounts}
+            >
+              {instagramAccounts.length > 0 ? 'Refresh Instagram Accounts' : 'Get My Instagram Accounts'}
+            </button>
+
+            <div className="instagram-accounts-container">
+              {instagramAccounts.length > 0 ? (
+                <ul className="instagram-accounts-list">
+                  {instagramAccounts.map(account => (
+                    <li key={account.instagramId} className="instagram-account-item">
+                      <div className='account-profile'>
+
+                      
+                        <div className="account-profile-image-container">
+                          <img 
+                            src={account.profilePictureUrl} 
+                            alt={`@${account.username}`} 
+                            className="account-profile-image" 
+                          />
+                          <div className="instagram-icon-badge">
+                            <FontAwesomeIcon icon={faInstagram} />
+                          </div>
+                        </div>
+                        
+                        <div className="account-info">
+                          
+                          <div className="account-details">
+                            <h3 className="account-username">@{account.username}</h3>
+                            <div className="account-detail">
+                              <span className="detail-label">ID:</span>
+                              <span className="detail-value">{account.instagramId}</span>
+                            </div>
+                            <div className="account-detail">
+                              <span className="detail-label">Page:</span>
+                              <span className="detail-value">{account.pageName}</span>
+                            </div>
+                          </div>
+                          
+                        </div>
+                      </div>
+
+                      <div className="account-actions">
+                        <a 
+                          href={`https://www.instagram.com/${account.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className='view-page-link'
+                        >
+                          View Profile
+                        </a>
+
+                        <button 
+                          className='post-button'
+                          onClick={() => {
+                            console.log('Navigating to: /createPost/pages/' + account.id);
+                            history.push('/createPost/instagram/' + account.id)
+                          }}
+                        >
+                          Create Post
+                        </button>
+                      </div>
+                    </li>
+                    
+                  ))}
+                </ul>
+              ) : (
+                <p className="no-accounts-message">No Instagram accounts found.</p>
+              )}
+            </div>
           </div>
           <div className="feature">
             <h2>Threads</h2>

@@ -35,6 +35,7 @@ const App = () => {
                 <Switch>
                     <Route exact path="/" component={HomePage} />
                     <Route path="/createPost/pages/:pageId" component={CreatePost} />
+                    <Route path="/createPost/instagram/:accountId" component={CreatePost} />
                     {/* Add more routes as needed */}
                 </Switch>
             </main>
