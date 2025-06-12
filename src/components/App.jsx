@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Switch } from 'react-router-dom';
+import ProtectedRoute from '../services/ProtectedRoute.js';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import HomePage from '../pages/homePage.jsx';
@@ -34,8 +35,8 @@ const App = () => {
             <main>
                 <Switch>
                     <Route exact path="/" component={HomePage} />
-                    <Route path="/createPost/pages/:pageId" component={CreatePost} />
-                    <Route path="/createPost/instagram/:accountId" component={CreatePost} />
+                    <ProtectedRoute path="/createPost/pages/:pageId" component={CreatePost} />
+                    <ProtectedRoute path="/createPost/instagram/:accountId" component={CreatePost} />
                     {/* Add more routes as needed */}
                 </Switch>
             </main>

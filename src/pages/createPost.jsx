@@ -6,16 +6,31 @@ import '../styles/createPost.css';
 import ImageUploader from '../components/imageUploader';
 import ImageUrlUploader from '../components/imageUrlUploader';
 const pagesHelper = require('../components/helpers/pagesHelpers');
+const instagramHelper = require('../components/helpers/instagramHelpers');
 
 const CreatePost = () => {
+    const [accountType, setAccountType] = useState('');
     const { pageId } = useParams();
     console.log('CreatePost pageId:', pageId);
+
+    const { accountId } = useParams();
+    console.log('CreatePost accountId:', accountId);
+
+    useEffect(() => {
+        if (pageId) {
+            setAccountType('Page');
+        } else if (accountId) {
+            setAccountType('Instagram');
+        }
+    }, [pageId, accountId]);
 
     const [imageResetKey, setImageResetKey] = useState(0);
     const [activeTab, setActiveTab] = useState('image');
     const [imageUrl, setImageUrl] = useState('');
     const [linkUrl, setLinkUrl] = useState('');
     const [error, setError] = useState(null);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleGoBack = () => {
         window.history.back();
@@ -26,6 +41,7 @@ const CreatePost = () => {
     }, [imageUrl]);
 
     const handleFormSubmit = async (e) => {
+        
         e.preventDefault();
 
         const form = e.target;
@@ -40,35 +56,42 @@ const CreatePost = () => {
             link: activeTab === 'link' ? linkUrl : null
         });
 
-        if (activeTab === 'image' && !imageUrl) {
-            setError('Please enter a valid image URL before submitting.');
-            return;
-        }
-        
-        if (activeTab === 'link' && !linkUrl) {
-            setError('Please enter a valid URL before submitting.');
-            return;
-        }
-
         let response;
         let body;
         try {
+            setIsLoading(true);
             switch (activeTab) {
                 
                 case 'link':
+                    if (!linkUrl) {
+                        setError('Please enter a valid URL.');
+                        return;
+                    }
                     body = {
                         link: linkUrl,
                         message: message,
                     };
+                    if (accountType === 'Instagram') {
+                        setError('Instagram does not support link posts.');
+                        return;
+                    }
                     response = await pagesHelper.postLinkToFacebookPage(pageId, body);
                     break;
                 
                 case 'image':
+                    if (!imageUrl) {
+                        setError('Please enter a valid image URL.');
+                        return;
+                    }
                     body = {
                         message: message,
                         imageUrl: imageUrl,
                     }
-                    response = await pagesHelper.postImageToFacebookPage(pageId, body); //image);
+                    if (accountType === 'Instagram') {
+                        response = await instagramHelper.postImageToInstagram(accountId, body);
+                        break;
+                    }
+                    response = await pagesHelper.postImageToFacebookPage(pageId, body);
                     break;
 
                 default:
@@ -90,6 +113,8 @@ const CreatePost = () => {
         } catch (err) {
             console.error('Error creating post:', err);
             toast.error('Failed to create post. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -103,7 +128,7 @@ const CreatePost = () => {
                 >
                     ← Back
                 </button>
-                <h1>Create a New Post</h1>
+                <h1>Creating Post for {accountType}</h1>
                 <div className="spacer"></div>
             </div>
             <div className="tab-container">
@@ -114,13 +139,15 @@ const CreatePost = () => {
                 >
                     Image
                 </button>
-                <button 
-                    type="button"
-                    className={`tab-button ${activeTab === 'link' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('link')}
-                >
-                    Link
-                </button>
+                {accountType === 'Page' && (
+                    <button 
+                        type="button"
+                        className={`tab-button ${activeTab === 'link' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('link')}
+                    >
+                        Link
+                    </button>
+                )}
             </div>
             <form onSubmit={handleFormSubmit}>
                 <div className="form-group">
@@ -153,7 +180,10 @@ const CreatePost = () => {
                     <label htmlFor="message">Message:</label>
                     <textarea id="message" name="message" required></textarea>
                 </div>
-                <button type="submit">
+                <button 
+                    disabled={(!imageUrl && !linkUrl) || isLoading} 
+                    type="submit"
+                >
                     Submit
                 </button>
             </form>

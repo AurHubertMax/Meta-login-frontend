@@ -51,7 +51,8 @@ const HomePage = () => {
         console.error('Error loading Facebook SDK:', error);
       }
     };
-    initializeFacebookSDK();
+
+    initializeFacebookSDK()
     
   }, []);
 
@@ -71,6 +72,15 @@ const HomePage = () => {
     } else if (response.status === 'error') {
       toast.error(response.message);
     }
+  };
+
+  const handleThreadsLogin = async () => {
+    await loginHelper.handleThreadsLogin();
+    // if (response.status === 'success') {
+    //   toast.success('Connected with Threads successfully!');
+    // } else if (response.status === 'error') {
+    //   toast.error(response.message);
+    // }
   };
 
   const handleLogoutButtonClick = async () => {
@@ -328,8 +338,8 @@ const HomePage = () => {
                         <button 
                           className='post-button'
                           onClick={() => {
-                            console.log('Navigating to: /createPost/pages/' + account.id);
-                            history.push('/createPost/instagram/' + account.id)
+                            console.log('Navigating to: /createPost/instagram/' + account.instagramId);
+                            history.push('/createPost/instagram/' + account.instagramId)
                           }}
                         >
                           Create Post
@@ -347,6 +357,12 @@ const HomePage = () => {
           <div className="feature">
             <h2>Threads</h2>
             <p>Enjoy a consistent experience across all your devices.</p>
+            <button 
+              className='cta-button'
+              onClick={handleThreadsLogin}
+            >
+              Connect with Threads
+            </button>
           </div>
         </section>
       )}

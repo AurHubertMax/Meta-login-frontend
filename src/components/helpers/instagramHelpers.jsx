@@ -15,3 +15,19 @@ export const getInstagramAccounts = () => {
         })
     })
 }
+
+export const postImageToInstagram = (accountId, body) => {
+    return new Promise((resolve, reject) => {
+        api.post(`/instagram/post/image/${accountId}`, body)
+        .then(response => {
+            console.log("Instagram image post response:", response.data);
+            resolve(response.data);
+        })
+        .catch(error => {
+            resolve({
+                status: "error",
+                message: error.response?.data?.message || "An error occurred while posting image to Instagram account."
+            });
+        })
+    })
+}
