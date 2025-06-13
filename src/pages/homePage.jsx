@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/home.css';
 import { toast } from 'react-toastify';
-// import { loadFacebookSDK, handleFacebookLogin } from '../components/helpers/loginHelpers';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { useHistory } from 'react-router-dom';
 const loginHelper = require('../components/helpers/loginHelpers');
+const pagesHelper = require('../components/helpers/pagesHelpers');
+const instagramHelper = require('../components/helpers/instagramHelpers');
+
+
 
 const HomePage = () => {
+  const history = useHistory();
+
+
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Disconnected');
   const [tokenInfo, setTokenInfo] = useState({
@@ -14,6 +24,8 @@ const HomePage = () => {
     timestamp: null,
     expiresIn: null
   });
+  const [pages, setPages] = useState([]);
+  const [instagramAccounts, setInstagramAccounts] = useState([]);
 
   useEffect(() => {
     const initializeFacebookSDK = async () => {
@@ -21,25 +33,26 @@ const HomePage = () => {
         await loginHelper.loadFacebookSDK();
         console.log('Facebook SDK loaded successfully');
 
-        const loginStatus = await loginHelper.checkFacebookLoginStatus();
+        const loginStatus = await loginHelper.getFacebookAuthStatus();
         console.log('Login status:', loginStatus);
 
-        if (loginStatus.status === 'connected') {
+        if (loginStatus.status === 'success' && loginStatus.data.status === 'connected') {
           setConnectionStatus('Connected');
-          console.log('accessToken:', loginStatus.authResponse.accessToken);
+          // console.log('accessToken:', loginStatus.authResponse.accessToken);
           setTokenInfo({
-            status: loginStatus.status,
-            message: loginStatus.message,
-            userId: loginStatus.authResponse.userID,
+            status: loginStatus.data.status,
+            message: loginStatus.data.message,
+            userId: loginStatus.data.userId,
             timestamp: new Date().toISOString(),
-            expiresIn: loginStatus.authResponse.expiresIn
+            expiresIn: new Date(loginStatus.data.tokenExpiresAt).getTime() - new Date().getTime()
           });
         }
       } catch (error) {
         console.error('Error loading Facebook SDK:', error);
       }
     };
-    initializeFacebookSDK();
+
+    initializeFacebookSDK()
     
   }, []);
 
@@ -59,6 +72,15 @@ const HomePage = () => {
     } else if (response.status === 'error') {
       toast.error(response.message);
     }
+  };
+
+  const handleThreadsLoginButtonClick = async () => {
+    await loginHelper.handleThreadsLogin();
+    // if (response.status === 'success') {
+    //   toast.success('Connected with Threads successfully!');
+    // } else if (response.status === 'error') {
+    //   toast.error(response.message);
+    // }
   };
 
   const handleLogoutButtonClick = async () => {
@@ -81,6 +103,28 @@ const HomePage = () => {
 
   const toggleDetails = () => {
     setDetailsExpanded(prev => !prev);
+  }
+
+  const handleGetPages = async () => {
+    console.log('Fetching Facebook pages...');
+    const response = await pagesHelper.getFacebookPages();
+    if (response.status === 'success') {
+      setPages(response.data);
+      toast.success('Fetched Facebook pages successfully!');
+    } else {
+      toast.error(response.message);
+    }
+  }
+
+  const handleGetInstagramAccounts = async () => {
+    console.log('Fetching Instagram accounts...');
+    const response = await instagramHelper.getInstagramAccounts();
+    if (response.status === 'success') {
+      setInstagramAccounts(response.data);
+      toast.success('Fetched Instagram accounts successfully!');
+    } else {
+      toast.error(response.message);
+    }
   }
 
   return (
@@ -116,7 +160,23 @@ const HomePage = () => {
               <div className="detail-item">
                 <span className="detail-label">Expires In:</span>
                 <span className="detail-value">
-                  {tokenInfo.expiresIn ? `${Math.floor(tokenInfo.expiresIn / 3600)} hours` : 'Unknown'}
+                  {
+                    tokenInfo.expiresIn ? 
+                      (() => {
+                        const days = Math.floor(tokenInfo.expiresIn / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((tokenInfo.expiresIn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((tokenInfo.expiresIn % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        if (days > 0) {
+                          return `${days} day${days !== 1 ? 's' : ''} ${hours} hour${hours !== 1 ? 's' : ''}`;
+                        } else if (hours > 0) {
+                          return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                        } else {
+                          return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                        }
+                      })() : 
+                      'Unknown'
+                  }
                 </span>
               </div>
             </div>
@@ -142,21 +202,178 @@ const HomePage = () => {
         </div>
         
       </header>
+      <button 
+        className='cta-button'
+        onClick={handleThreadsLoginButtonClick}
+      >
+        Connect with Threads
+      </button>
+      { connectionStatus === 'Connected' && (
+        <section className="features">
+          <div className="feature">
+            <h2>Pages</h2>
+            <p>See Facebook Pages connected to your account.</p>
+            <button 
+              className='cta-button'
+              onClick={handleGetPages}
+            >
+              {pages.length > 0 ? 'Refresh Pages' : 'Get My Pages'}
+            </button>
+
+            <div className="pages-list-container">
+              {pages.length > 0 ? (
+                <ul className="pages-list">
+                  {pages.map(page => (
+                    <li key={page.id} className="page-item">
+                      <div className="page-info">
+                        <h3 className="page-name">
+                          {page.name}
+                          {page.instagram_business_account && (
+                            <a
+                              href={`https://www.instagram.com/accounts/${page.instagram_business_account.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className='instagram-badge'
+                              title='View on Instagram'
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faInstagram} />
+                              <span className="instagram-text">Instagram</span>
+                            </a>
+                          )}
+                        </h3>
+                        
+                        <div className="page-details">
+                          <span className='page-id'>ID: {page.id}</span>
+                          
+                        </div>
+                        <div className='page-tasks'>
+                          {page.tasks.map(task => (
+                            <span key={task} className='task-badge'>{task}</span>
+                          ))}
+                        </div>
+                        <div className='page-actions'>
+                          <a
+                            href={`https://www.facebook.com/${page.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className='view-page-link'
+                          >
+                            View Page
+                          </a>
+                          <button 
+                            className='post-button'
+                            onClick={() => {
+                              console.log('Navigating to: /createPost/pages/' + page.id);
+                              history.push('/createPost/pages/' + page.id)
+                            }}
+                          >
+                            Create Post
+                          </button>
+                        </div>
+                      </div>
+                      
+                    </li>
+                    
+                  ))}
+                </ul>
+              ) : (
+                <p className="no-pages-message">No pages found.</p>
+              )}
+            </div>
+          </div>
+          <div className="feature">
+            <h2>Instagram</h2>
+            <p>See your Instagram account connected to your Facebook account.</p>
+            <button 
+              className='cta-button'
+              onClick={handleGetInstagramAccounts}
+            >
+              {instagramAccounts.length > 0 ? 'Refresh Instagram Accounts' : 'Get My Instagram Accounts'}
+            </button>
+
+            <div className="instagram-accounts-container">
+              {instagramAccounts.length > 0 ? (
+                <ul className="instagram-accounts-list">
+                  {instagramAccounts.map(account => (
+                    <li key={account.instagramId} className="instagram-account-item">
+                      <div className='account-profile'>
+
+                      
+                        <div className="account-profile-image-container">
+                          <img 
+                            src={account.profilePictureUrl} 
+                            alt={`@${account.username}`} 
+                            className="account-profile-image" 
+                          />
+                          <div className="instagram-icon-badge">
+                            <FontAwesomeIcon icon={faInstagram} />
+                          </div>
+                        </div>
+                        
+                        <div className="account-info">
+                          
+                          <div className="account-details">
+                            <h3 className="account-username">@{account.username}</h3>
+                            <div className="account-detail">
+                              <span className="detail-label">ID:</span>
+                              <span className="detail-value">{account.instagramId}</span>
+                            </div>
+                            <div className="account-detail">
+                              <span className="detail-label">Page:</span>
+                              <span className="detail-value">{account.pageName}</span>
+                            </div>
+                          </div>
+                          
+                        </div>
+                      </div>
+
+                      <div className="account-actions">
+                        <a 
+                          href={`https://www.instagram.com/${account.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className='view-page-link'
+                        >
+                          View Profile
+                        </a>
+
+                        <button 
+                          className='post-button'
+                          onClick={() => {
+                            console.log('Navigating to: /createPost/instagram/' + account.instagramId);
+                            history.push('/createPost/instagram/' + account.instagramId)
+                          }}
+                        >
+                          Create Post
+                        </button>
+                      </div>
+                    </li>
+                    
+                  ))}
+                </ul>
+              ) : (
+                <p className="no-accounts-message">No Instagram accounts found.</p>
+              )}
+            </div>
+          </div>
+          <div className="feature">
+            <h2>Threads</h2>
+            <p>Enjoy a consistent experience across all your devices.</p>
+            {/* <button 
+              className='cta-button'
+              onClick={handleThreadsLoginButtonClick}
+            >
+              Connect with Threads
+            </button> */}
+          </div>
+        </section>
+      )}
       
-      <section className="features">
-        <div className="feature">
-          <h2>Facebook</h2>
-          <p>Connect your Meta account in just a few clicks.</p>
-        </div>
-        <div className="feature">
-          <h2>Instagram</h2>
-          <p>Your data is always protected with our secure authentication.</p>
-        </div>
-        <div className="feature">
-          <h2>Threads</h2>
-          <p>Enjoy a consistent experience across all your devices.</p>
-        </div>
-      </section>
+
+      
     </div>
   );
 };

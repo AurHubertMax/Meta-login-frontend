@@ -156,3 +156,296 @@ main {
   color: #1877f2;
   margin-top: 0;
 }
+
+/* Pages List Styling */
+.pages-feature {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.pages-list-container {
+  margin-top: 20px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.pages-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.page-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.page-item:hover {
+  background-color: #f7f9fc;
+}
+
+.page-item:last-child {
+  border-bottom: none;
+}
+
+.page-info {
+  flex: 1;
+}
+
+.page-name {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  /* color: #1877f2; */
+  color: #262626;
+}
+
+.page-details {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.page-id {
+  background-color: #f0f2f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  margin-right: 8px;
+}
+
+.instagram-badge {
+  display: inline-flex;
+  align-items: center;
+  color: #E1306C;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.instagram-badge:hover {
+  background-color: #C13584;
+  text-decoration: none;
+  color: white;
+}
+
+.instagram-text {
+  margin-left: 4px;
+}
+
+.page-tasks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.task-badge {
+  background-color: #e4f2fe;
+  color: #1877f2;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: lowercase;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.view-page-link {
+  color: #1877f2;
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.view-page-link:hover {
+  color: #166fe5;
+}
+
+.post-button {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.post-button:hover {
+  background-color: #166fe5;
+}
+
+.no-pages {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+/* Instagram Accounts Styling */
+.instagram-accounts-container {
+  margin-top: 20px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.instagram-accounts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.account-profile {
+  display: flex;
+  flex-direction: row;
+}
+
+.instagram-account-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.instagram-account-item:hover {
+  background-color: #f7f9fc;
+}
+
+.instagram-account-item:last-child {
+  border-bottom: none;
+}
+
+.account-profile-image-container {
+  position: relative;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.account-profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.instagram-icon-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border: 2px solid white;
+}
+
+.account-info {
+  flex: 1;
+}
+
+.account-username {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #262626;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-details {
+  margin-bottom: 12px;
+}
+
+.account-detail {
+  display: flex;
+  margin-bottom: 4px;
+  font-size: 12px;
+  gap: 8px;
+}
+
+/* .account-detail {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  margin-bottom: 4px;
+  font-size: 12px;
+} */
+
+.detail-label {
+  color: #8e8e8e;
+  margin-right: 6px;
+  /* min-width: 90px; */
+  min-width: auto;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: #262626;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.view-profile-link:hover {
+  background-color: rgba(0, 149, 246, 0.1);
+}
+
+.no-accounts-message {
+  padding: 20px;
+  text-align: center;
+  color: #8e8e8e;
+}
+
+@media (max-width: 500px) {
+  .account-profile-image-container {
+    margin-bottom: 15px;
+  }
+  
+  .account-info {
+    width: 100%;
+  }
+  
+  .detail-label {
+    min-width: 80px;
+  }
+}
