@@ -74,7 +74,7 @@ const HomePage = () => {
     }
   };
 
-  const handleThreadsLogin = async () => {
+  const handleThreadsLoginButtonClick = async () => {
     await loginHelper.handleThreadsLogin();
     // if (response.status === 'success') {
     //   toast.success('Connected with Threads successfully!');
@@ -202,7 +202,12 @@ const HomePage = () => {
         </div>
         
       </header>
-      
+      <button 
+        className='cta-button'
+        onClick={handleThreadsLoginButtonClick}
+      >
+        Connect with Threads
+      </button>
       { connectionStatus === 'Connected' && (
         <section className="features">
           <div className="feature">
@@ -357,12 +362,12 @@ const HomePage = () => {
           <div className="feature">
             <h2>Threads</h2>
             <p>Enjoy a consistent experience across all your devices.</p>
-            <button 
+            {/* <button 
               className='cta-button'
-              onClick={handleThreadsLogin}
+              onClick={handleThreadsLoginButtonClick}
             >
               Connect with Threads
-            </button>
+            </button> */}
           </div>
         </section>
       )}
