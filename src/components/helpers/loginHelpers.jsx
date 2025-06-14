@@ -22,6 +22,22 @@ export const handleThreadsLogin = async () => {
     const response = await api.get(`/auth/threads/login`) 
     console.log("Threads login response:", response);
     window.open(response.data.data.url, "_blank", "width=600,height=600");
+
+    window.addEventListener('message', async (event) => {
+        if (event.data && event.data.status === 'success') {
+            console.log("Threads login success:", event.data);
+            await api.post(`/threads/updateSession`, {
+                data: event.data
+            })
+            return {
+                status: "success",
+                message: "Logged in successfully.",
+                data: event.data
+            };
+        }
+    })
+
+    
 }
 
 export const loadFacebookSDK = () => {
