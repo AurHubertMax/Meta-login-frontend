@@ -3,11 +3,13 @@ import '../styles/home.css';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { faThreads } from '@fortawesome/free-brands-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { useHistory } from 'react-router-dom';
 const loginHelper = require('../components/helpers/loginHelpers');
 const pagesHelper = require('../components/helpers/pagesHelpers');
 const instagramHelper = require('../components/helpers/instagramHelpers');
+const threadsHelper = require('../components/helpers/threadsHelpers');
 
 
 
@@ -17,6 +19,7 @@ const HomePage = () => {
 
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Disconnected');
+  const [threadsConnectionStatus, setThreadsConnectionStatus] = useState('Disconnected');
   const [tokenInfo, setTokenInfo] = useState({
     status: null,
     message: null,
@@ -26,6 +29,7 @@ const HomePage = () => {
   });
   const [pages, setPages] = useState([]);
   const [instagramAccounts, setInstagramAccounts] = useState([]);
+  const [threadsAccount, setThreadsAccount] = useState(null);
 
   useEffect(() => {
     const initializeFacebookSDK = async () => {
@@ -76,12 +80,18 @@ const HomePage = () => {
 
   const handleThreadsLoginButtonClick = async () => {
     await loginHelper.handleThreadsLogin();
-    // if (response.status === 'success') {
-    //   toast.success('Connected with Threads successfully!');
-    // } else if (response.status === 'error') {
-    //   toast.error(response.message);
-    // }
+    setThreadsConnectionStatus('Connected');
   };
+
+  const handleGetThreadsAccount = async () => {
+    const response = await threadsHelper.getThreadsAccount();
+    if (response.status === 'success') {
+      toast.success('Fetched Threads account successfully!');
+      setThreadsAccount(response.data);
+    } else {
+      toast.error(response.message);
+    }
+  }
 
   const handleLogoutButtonClick = async () => {
     const response = await loginHelper.handleFacebookLogout();
@@ -202,12 +212,6 @@ const HomePage = () => {
         </div>
         
       </header>
-      <button 
-        className='cta-button'
-        onClick={handleThreadsLoginButtonClick}
-      >
-        Connect with Threads
-      </button>
       { connectionStatus === 'Connected' && (
         <section className="features">
           <div className="feature">
@@ -361,13 +365,72 @@ const HomePage = () => {
           </div>
           <div className="feature">
             <h2>Threads</h2>
-            <p>Enjoy a consistent experience across all your devices.</p>
-            {/* <button 
+            <p>See your Threads account connected to your Facebook account.</p>
+            <button 
               className='cta-button'
-              onClick={handleThreadsLoginButtonClick}
+              onClick={threadsConnectionStatus === 'Connected' ? handleGetThreadsAccount : handleThreadsLoginButtonClick}
             >
-              Connect with Threads
-            </button> */}
+              {threadsConnectionStatus === 'Connected' ? 'Refresh Threads Account' : 'Connect with Threads'}
+            </button>
+
+            <div className="threads-account-container">
+              {threadsAccount ? (
+                <div className="threads-account-card">
+                  <div className='account-profile'>
+                    <div className="account-profile-image-container">
+                      <img 
+                        src={threadsAccount.threads_profile_picture_url} 
+                        alt={`@${threadsAccount.username}`} 
+                        className="account-profile-image" 
+                      />
+                      <div className="threads-icon-badge">
+                        <FontAwesomeIcon icon={faThreads} />
+                      </div>
+                    </div>
+                    
+                    <div className="account-info">
+                      <div className="account-details">
+                        <h3 className="account-username">@{threadsAccount.username}</h3>
+                        <div className="account-detail">
+                          <span className="detail-label">ID:</span>
+                          <span className="detail-value">{threadsAccount.id}</span>
+                        </div>
+                        <div className="account-detail">
+                          <span className="detail-label">Name:</span>
+                          <span className="detail-value">{threadsAccount.name}</span>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="account-actions">
+                    <a 
+                      href={`https://www.threads.net/@${threadsAccount.username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className='view-page-link threads-link'
+                    >
+                      View Profile
+                    </a>
+
+                    <button 
+                      className='post-button threads-button'
+                      onClick={() => {
+                        console.log('Navigating to: /createPost/threads/' + threadsAccount.id);
+                        history.push('/createPost/threads/' + threadsAccount.id)
+                      }}
+                    >
+                      Create Thread
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="no-accounts-message">
+                  {threadsConnectionStatus === 'Connected' ? 'Click "Refresh Threads Account" to load your profile' : 'Connect with Threads to see your account here'}
+                </p>
+              )}
+            </div>
           </div>
         </section>
       )}
