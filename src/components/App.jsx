@@ -37,6 +37,7 @@ const App = () => {
                     <Route exact path="/" component={HomePage} />
                     <ProtectedRoute path="/createPost/pages/:pageId" component={CreatePost} />
                     <ProtectedRoute path="/createPost/instagram/:accountId" component={CreatePost} />
+                    <ProtectedRoute path="/createPost/threads/:threadsId" component={CreatePost} />
                     {/* Add more routes as needed */}
                 </Switch>
             </main>

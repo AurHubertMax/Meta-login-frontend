@@ -3,10 +3,10 @@ import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import '../styles/createPost.css';
-import ImageUploader from '../components/imageUploader';
 import ImageUrlUploader from '../components/imageUrlUploader';
 const pagesHelper = require('../components/helpers/pagesHelpers');
 const instagramHelper = require('../components/helpers/instagramHelpers');
+const threadsHelper = require('../components/helpers/threadsHelpers');
 
 const CreatePost = () => {
     const [accountType, setAccountType] = useState('');
@@ -16,13 +16,18 @@ const CreatePost = () => {
     const { accountId } = useParams();
     console.log('CreatePost accountId:', accountId);
 
+    const { threadsId } = useParams();
+    console.log('CreatePost threadsId:', threadsId);
+
     useEffect(() => {
         if (pageId) {
             setAccountType('Page');
         } else if (accountId) {
             setAccountType('Instagram');
+        } else if (threadsId) {
+            setAccountType('Threads');
         }
-    }, [pageId, accountId]);
+    }, [pageId, accountId, threadsId]);
 
     const [imageResetKey, setImageResetKey] = useState(0);
     const [activeTab, setActiveTab] = useState('image');
@@ -75,6 +80,15 @@ const CreatePost = () => {
                         setError('Instagram does not support link posts.');
                         return;
                     }
+                    if (accountType === 'Threads') {
+                        let threadsBody = {
+                            data: linkUrl,
+                            text: message,
+                            type: 'LINK'
+                        }
+                        response = await threadsHelper.postThreads(threadsId, threadsBody);
+                        break;
+                    }
                     response = await pagesHelper.postLinkToFacebookPage(pageId, body);
                     break;
                 
@@ -89,6 +103,15 @@ const CreatePost = () => {
                     }
                     if (accountType === 'Instagram') {
                         response = await instagramHelper.postImageToInstagram(accountId, body);
+                        break;
+                    }
+                    if (accountType === 'Threads') {
+                        let threadsBody = {
+                            data: imageUrl,
+                            text: message,
+                            type: 'IMAGE'
+                        }
+                        response = await threadsHelper.postThreads(threadsId, threadsBody);
                         break;
                     }
                     response = await pagesHelper.postImageToFacebookPage(pageId, body);
@@ -139,7 +162,7 @@ const CreatePost = () => {
                 >
                     Image
                 </button>
-                {accountType === 'Page' && (
+                {(accountType === 'Page' || accountType === 'Threads') && (
                     <button 
                         type="button"
                         className={`tab-button ${activeTab === 'link' ? 'active' : ''}`}

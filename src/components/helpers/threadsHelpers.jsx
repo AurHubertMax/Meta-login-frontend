@@ -15,3 +15,19 @@ export const getThreadsAccount = () => {
         })
     })
 }
+
+export const postThreads = (accountId, body) => {
+    return new Promise((resolve, reject) => {
+        api.post(`/threads/post`, body)
+        .then(response => {
+            console.log("Threads post response:", response.data);
+            resolve(response.data);
+        })
+        .catch(error => {
+            resolve({
+                status: "error",
+                message: error.response?.data?.message || "An error occurred while posting to Threads account."
+            });
+        })
+    })
+}
